@@ -69,7 +69,7 @@ class DQNAgent(nn.Module):
 
         # Compute target values
         with torch.no_grad():
-            # TODO(student): compute target values
+            # compute target values
             next_qa_values = self.target_critic(next_obs)  # (batch_size, num_action)
 
             if self.use_double_q:
@@ -77,12 +77,17 @@ class DQNAgent(nn.Module):
             else:
                 next_action = torch.argmax(next_qa_values, dim=-1)  # (batch_size,)
 
-            next_q_values = next_qa_values.gather(dim=-1, index=next_action.unsqueeze(-1))  # (batch_size,)
+            next_q_values = next_qa_values.gather(dim=-1, index=next_action.unsqueeze(-1)).squeeze(-1)  # (batch_size,)
             target_values = reward + self.discount * (~done) * next_q_values
 
-        # TODO(student): train the critic with the target values
+        # train the critic with the target values
         qa_values = self.critic(obs)  # (batch_size, num_action)
-        q_values = torch.gather(qa_values, dim=-1, index=action.unsqueeze(-1))  # (batch_size,)
+        q_values = torch.gather(qa_values, dim=-1, index=action.unsqueeze(-1)).squeeze(-1)  # (batch_size,)
+
+        # Shape assertion to prevent silent broadcasting bugs
+        assert q_values.shape == target_values.shape == (batch_size,), \
+            f"Shape mismatch! q_values: {q_values.shape}, target_values: {target_values.shape}, expected: ({batch_size},)"
+
         loss = (q_values - target_values).pow(2).mean()
 
 

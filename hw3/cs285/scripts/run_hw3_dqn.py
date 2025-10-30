@@ -125,6 +125,8 @@ def run_training_loop(config: dict, logger: Logger, args: argparse.Namespace):
             reset_env_training()
 
             logger.log_scalar(info["episode"]["r"], "train/train_return", step)
+            logger.log_scalar(info["episode"]["r"] / info["episode"]["l"], "train/train_return_per_action", step)
+
             logger.log_scalar(info["episode"]["l"], "train/train_ep_len", step)
         else:
             observation = next_observation
