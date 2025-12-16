@@ -73,7 +73,7 @@ class DQNAgent(nn.Module):
             next_qa_values = self.target_critic(next_obs)  # (batch_size, num_action)
 
             if self.use_double_q:
-                raise NotImplementedError
+                next_action = torch.argmax(self.critic(next_obs), dim=-1)  # (batch_size,)
             else:
                 next_action = torch.argmax(next_qa_values, dim=-1)  # (batch_size,)
 
