@@ -107,7 +107,7 @@ def run_training_loop(config: dict, logger: Logger, args: argparse.Namespace):
             replay_buffer.insert(
                 action=action,
                 reward=reward,
-                next_observation=next_observation,
+                next_observation=next_observation[-1, ...],  # Only the last frame
                 done=done_done,
             )
         else:
@@ -204,7 +204,7 @@ def main():
 
     parser.add_argument("--eval_interval", "-ei", type=int, default=10000)
     parser.add_argument("--num_eval_trajectories", "-neval", type=int, default=10)
-    parser.add_argument("--num_render_trajectories", "-nvid", type=int, default=0)
+    parser.add_argument("--num_render_trajectories", "-nvid", type=int, default=1)
 
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--no_gpu", "-ngpu", action="store_true")
